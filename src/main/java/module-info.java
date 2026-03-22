@@ -3,6 +3,6 @@ module org.example.gamify {
     requires javafx.fxml;
 
 
-    opens org.example.gamify to javafx.fxml;
-    exports org.example.gamify;
+    opens Java.gamify to javafx.fxml;
+    exports Java.gamify;
 }
