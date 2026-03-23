@@ -83,7 +83,7 @@ public class GamifyListener implements Runnable{
             System.out.println("*** ORDER MATCHED ***");
             System.out.println("Side: "         + side);
             System.out.println("Title: "        + title);
-            System.out.println("Price: $"       + price);
+            System.out.println("Price: €"       + price);
             System.out.println("Counterparty: " + counterparty);
             System.out.println("*********************");
         }
@@ -121,7 +121,7 @@ public class GamifyListener implements Runnable{
                         String side  = parts[0].equals(GamifyServiceDetails.BUY_SIDE) ? "BUY " : "SELL";
                         String title = parts[1];
                         String price = parts[2];
-                        System.out.printf("%-4s | %-22s | $%s%n", side, title, price);
+                        System.out.printf("%-4s | %-22s | €%s%n", side, title, price);
                     }
                 }
             }
