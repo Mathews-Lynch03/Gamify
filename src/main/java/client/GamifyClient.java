@@ -17,6 +17,7 @@ public class GamifyClient {
             OutputStream out = dataSocket.getOutputStream();
             PrintWriter output = new PrintWriter(new OutputStreamWriter(out));
 
+            // Build input stream and start listener thread
             InputStream in = dataSocket.getInputStream();
             BufferedReader serverInput = new BufferedReader(new InputStreamReader(in));
 
@@ -25,79 +26,95 @@ public class GamifyClient {
             listenerThread.setDaemon(true);
             listenerThread.start();
 
-            //Set up  scanner for user input
+            // Set up scanner for user input
             Scanner keyboard = new Scanner(System.in);
             String message = "";
 
-            System.out.println("Welcome to the Gamify Game Market (Stream-based Client).");
+            // Tracks whether the user has successfully registered a username.
+            // Options 2-5 are locked until this is true.
+            boolean isRegistered = false;
+
+            System.out.println("Connected to Gamify server on port " + GamifyServiceDetails.LISTENING_PORT + ".");
+            System.out.println("Welcome to the Gamify Game Market Client.");
             System.out.println("Please register your username before placing orders.");
 
             while (!message.equals(GamifyServiceDetails.END_SESSION))
             {
-                displayMenu();
+                displayMenu(isRegistered);
                 int choice = getNumber(keyboard);
                 String response = "";
 
                 if (choice >= 0 && choice < 6)
                 {
-                    switch (choice)
+                    // Block options 2-5 if no username has been registered yet
+                    if (choice >= 2 && !isRegistered)
                     {
-                        case 0:
-                            message = GamifyServiceDetails.END_SESSION;
-
-                            // Send message
-                            output.println(message);
-                            output.flush();
-
-                            // Give listener thread time to print the ENDED response
-                            Thread.sleep(300);
-                            listener.stop();
-                            break;
-
-                        case 1:
-                            message = generateRegisterUser(keyboard);
-
-                            // Send message
-                            output.println(message);
-                            output.flush();
-                            break;
-
-                        case 2:
-                            message = generateOrder(keyboard, GamifyServiceDetails.BUY_SIDE);
-
-                            // Send message
-                            output.println(message);
-                            output.flush();
-                            break;
-
-                        case 3:
-                            message = generateOrder(keyboard, GamifyServiceDetails.SELL_SIDE);
-
-                            // Send message
-                            output.println(message);
-                            output.flush();
-                            break;
-
-                        case 4:
-                            message = generateCancel(keyboard);
-
-                            // Send message
-                            output.println(message);
-                            output.flush();
-                            break;
-
-                        case 5:
-                            message = GamifyServiceDetails.VIEW;
-
-                            // Send message
-                            output.println(message);
-                            output.flush();
-                            break;
+                        System.out.println("You must register a username first. Please select option 1.");
                     }
+                    else
+                    {
+                        switch (choice)
+                        {
+                            case 0:
+                                message = GamifyServiceDetails.END_SESSION;
 
-                    // Allow the listener thread to print the server response
-                    // before the menu is displayed again
-                    Thread.sleep(400);
+                                // Send message
+                                output.println(message);
+                                output.flush();
+
+                                // Give listener thread time to print the ENDED response
+                                Thread.sleep(300);
+                                listener.stop();
+                                break;
+
+                            case 1:
+                                message = generateRegisterUser(keyboard);
+
+                                // Send message
+                                output.println(message);
+                                output.flush();
+
+                                // Mark the user as registered so the full menu unlocks
+                                isRegistered = true;
+                                break;
+
+                            case 2:
+                                message = generateOrder(keyboard, GamifyServiceDetails.BUY_SIDE);
+
+                                // Send message
+                                output.println(message);
+                                output.flush();
+                                break;
+
+                            case 3:
+                                message = generateOrder(keyboard, GamifyServiceDetails.SELL_SIDE);
+
+                                // Send message
+                                output.println(message);
+                                output.flush();
+                                break;
+
+                            case 4:
+                                message = generateCancel(keyboard);
+
+                                // Send message
+                                output.println(message);
+                                output.flush();
+                                break;
+
+                            case 5:
+                                message = GamifyServiceDetails.VIEW;
+
+                                // Send message
+                                output.println(message);
+                                output.flush();
+                                break;
+                        }
+
+                        // Allow the listener thread to print the server response
+                        // before the menu is displayed again
+                        Thread.sleep(400);
+                    }
                 }
                 else
                 {
@@ -115,15 +132,27 @@ public class GamifyClient {
         }
     }
 
-    public static void displayMenu()
+    public static void displayMenu(boolean isRegistered)
     {
         System.out.println();
         System.out.println("0) Exit");
         System.out.println("1) Register username");
-        System.out.println("2) Place a buy order");
-        System.out.println("3) Place a sell order");
-        System.out.println("4) Cancel an order");
-        System.out.println("5) View the order book");
+
+        // Options 2-5 are only available once a username has been registered
+        if (isRegistered)
+        {
+            System.out.println("2) Place a buy order");
+            System.out.println("3) Place a sell order");
+            System.out.println("4) Cancel an order");
+            System.out.println("5) View the order book");
+        }
+        else
+        {
+            System.out.println("2) Place a buy order    [register first]");
+            System.out.println("3) Place a sell order   [register first]");
+            System.out.println("4) Cancel an order      [register first]");
+            System.out.println("5) View the order book  [register first]");
+        }
     }
 
     // A method to retrieve a number from the user at all times.
