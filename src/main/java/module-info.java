@@ -4,5 +4,5 @@ module org.example.gamify {
 
 
     opens Java.gamify to javafx.fxml;
-    exports Java.gamify;
+
 }

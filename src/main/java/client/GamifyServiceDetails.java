@@ -15,10 +15,10 @@ public class GamifyServiceDetails {
     public static final String BUY_SIDE           = "B";
     public static final String SELL_SIDE          = "S";
 
-    // Separator used to build command strings  e.g. "USER:Alice"
+    // Separator used to build command strings  e.g. "USER:Seb"
     public static final String COMMAND_SEPARATOR  = ":";
 
-    // Separator used inside order payloads  e.g. "B,Zelda,25.00"
+    // Separator used inside orders  e.g. "B,Minecraft,25.00"
     public static final String FIELD_SEPARATOR    = ",";
 
     // Responses from server
